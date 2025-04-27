@@ -45,6 +45,8 @@ void loop() {
             // Redireciona para a página principal
             client.println("HTTP/1.1 303 See Other");
             client.println("Location: /");
+            client.println("Connection: close");
+            client.println("Content-Length: 0");
             client.println();
             return; // Finaliza a conexão após o redirecionamento
         }
