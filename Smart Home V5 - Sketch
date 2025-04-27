@@ -107,14 +107,19 @@ void loop() {
         client.println("<div class=\"container\">");
         client.println("<h1>Controle do LED</h1>");
 
+        
         // INICIO BOTAO LUZ AREA
-        client.println("<a href=\"/LuzArea_Toggle\" class=\"toggle\">Luz Area</a>");
-        client.println(luzareaState ? "<p class=\"status\">Luz Área está <strong>LIGADA</strong></p>" : "<p class=\"status\">Luz Área está <strong>DESLIGADA</strong></p>");
+        client.println(luzareaState 
+            ? "<a href=\"/LuzArea_Toggle\" class=\"toggle\" style=\"background:rgb(133, 0, 0); width: 50%; display: inline-block; text-align: center;\">Luz Area</a><p class=\"status\">Luz Area está <strong>LIGADA</strong></p>" 
+            : "<a href=\"/LuzArea_Toggle\" class=\"toggle\" style=\"background:rgb(0, 63, 0); width: 50%; display: inline-block; text-align: center;\">Luz Area</a><p class=\"status\">Luz Area está <strong>DESLIGADA</strong></p>");
         // FIM BOTAO LUZ AREA
-
+        
+        client.println("<br> ");
+        
         // INICIO BOTAO LUZ JARDIM
-        client.println("<a href=\"/LuzJardim_Toggle\" class=\"toggle\">Luz Jardim</a>");
-        client.println(luzjardimState ? "<p class=\"status\">Luz Jardim está <strong>LIGADA</strong></p>" : "<p class=\"status\">Luz Jardim está <strong>DESLIGADA</strong></p>");
+        client.println(luzjardimState 
+            ? "<a href=\"/LuzJardim_Toggle\" class=\"toggle\" style=\"background:rgb(133, 0, 0); width: 50%; display: inline-block; text-align: center;\">Luz Jardim</a><p class=\"status\">Luz Jardim está <strong>LIGADA</strong></p>" 
+            : "<a href=\"/LuzJardim_Toggle\" class=\"toggle\" style=\"background:rgb(0, 63, 0); width: 50%; display: inline-block; text-align: center;\">Luz Jardim</a><p class=\"status\">Luz Jardim está <strong>DESLIGADA</strong></p>");
         // FIM BOTAO LUZ JARDIM
 
 
