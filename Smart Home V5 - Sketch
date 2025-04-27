@@ -10,8 +10,14 @@ WiFiServer server(80);
 
 const int luz_area = 0; // LED conectado à porta 0
 const int botao_luz_area = 13; //botao fisico luz area
+
 const int luz_jardim = 1; // LED conectado à porta 1
+const int botao_luz_jardim = 12; //botao fisico luz jardim
+
+
 const int fita_led = 2; // LED conectado à porta 2
+const int botao_fita_led = 11; //botao fisico fita led
+
 
 bool luzareaState = false; // Estado inicial do LED
 bool luzjardimState = false; // Estado inicial do LED
@@ -26,15 +32,17 @@ void setup() {
     pinMode(luz_area, OUTPUT);
     digitalWrite(luz_area, LOW);
     
-    //botao fisico
-    pinMode(botao_luz_area, INPUT_PULLUP); // Configura o botão com pull-up interno
-
     pinMode(luz_jardim, OUTPUT);
     digitalWrite(luz_jardim, LOW);
 
     pinMode(fita_led, OUTPUT);
     digitalWrite(fita_led, LOW);
     
+    //INICIALIZACAO BOTOES FISICOS
+    //botao fisico luz area
+    pinMode(botao_luz_area, INPUT_PULLUP); // Configura o botão com pull-up interno
+    pinMode(botao_luz_jardim, INPUT_PULLUP); // Configura o botão com pull-up interno
+    pinMode(botao_fita_led, INPUT_PULLUP); // Configura o botão com pull-up interno
 
     // FIM INICIALIZACAO DAS VARIAVEIS
 
@@ -56,11 +64,32 @@ void setup() {
 void loop() {
 
 
+    // Lida com o botão físico da luz da área
     if (digitalRead(botao_luz_area) == LOW) { // Se botão pressionado
         delay(50); // Debounce simples
         if (digitalRead(botao_luz_area) == LOW) { // Confirma pressionado
             luzareaState = !luzareaState; // Alterna o estado
             digitalWrite(luz_area, luzareaState ? HIGH : LOW);
+            delay(300); // Evita múltiplos toggles muito rápidos
+        }
+    }
+
+    // Lida com o botão físico da luz do jardim
+    if (digitalRead(botao_luz_jardim) == LOW) { // Se botão pressionado
+        delay(50); // Debounce simples
+        if (digitalRead(botao_luz_jardim) == LOW) { // Confirma pressionado
+            luzjardimState = !luzjardimState; // Alterna o estado
+            digitalWrite(luz_jardim, luzjardimState ? HIGH : LOW);
+            delay(300); // Evita múltiplos toggles muito rápidos
+        }
+    }
+
+    // Lida com o botão físico da fita LED
+    if (digitalRead(botao_fita_led) == LOW) { // Se botão pressionado
+        delay(50); // Debounce simples
+        if (digitalRead(botao_fita_led) == LOW) { // Confirma pressionado
+            fitaledState = !fitaledState; // Alterna o estado
+            digitalWrite(fita_led, fitaledState ? HIGH : LOW);
             delay(300); // Evita múltiplos toggles muito rápidos
         }
     }
@@ -128,9 +157,6 @@ void loop() {
         client.println("<head>");
         client.println("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">");
 
-        // Meta tag para auto-refresh a cada 3 segundos (3000 ms)
-        // client.println("<meta http-equiv=\"refresh\" content=\"3\">");
-
         // JAVASCRIPT PARA RECARREGAR A PAGINA AO RESTAURAR A ABA
         client.println("<script>");
         client.println("document.addEventListener('visibilitychange', function() {");
@@ -141,6 +167,7 @@ void loop() {
         client.println("</script>");
         // FIM JAVASCRIPT 
 
+        
         client.println("<style>");
         client.println("body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: linear-gradient(135deg, #f4f4f4, #e0e0e0); color: #333; display: flex; justify-content: center; align-items: center; height: 100vh; }");
         client.println(".container { width: 90%; max-width: 300px; padding: 20px; background: #fff; border-radius: 12px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; top: -10%; }");
