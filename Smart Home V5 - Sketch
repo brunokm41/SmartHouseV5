@@ -25,15 +25,17 @@ const int botao_luz_area = 13; //botao fisico luz area
 const int luz_jardim = 1; // LED conectado à porta 1
 const int botao_luz_jardim = 12; //botao fisico luz jardim
 
-
 const int fita_led = 2; // LED conectado à porta 2
 const int botao_fita_led = 11; //botao fisico fita led
 
+const int alarme = 3; // LED conectado à porta 3
+int verifica_alarme = 10; // verifica alarme ativo ou nao
 
 bool luzareaState = false; // Estado inicial do LED
 bool luzjardimState = false; // Estado inicial do LED
 bool fitaledState = false; // Estado inicial do LED
-
+bool alarmeState = false; // Estado inicial do LED
+//int alarmeState = digitalRead(verifica_alarme); // Estado inicial do LED
 //FIM VARIAVEIS DO PROJETO
 
 void setup() {
@@ -48,6 +50,10 @@ void setup() {
 
     pinMode(fita_led, OUTPUT);
     digitalWrite(fita_led, LOW);
+
+    pinMode(alarme, OUTPUT);
+    pinMode(verifica_alarme, OUTPUT);
+    //digitalWrite(alarme, LOW);
     
     //INICIALIZACAO BOTOES FISICOS
     //botao fisico luz area
@@ -74,6 +80,13 @@ void setup() {
 
 void loop() {
 
+
+    // Verifica se o alarme esta ativado
+    if (digitalRead(verifica_alarme) == 0) { // Se o alarme estiver ativado
+        alarmeState = true; // Alarme ativado
+    } else if (digitalRead(verifica_alarme) == 1) { // Se o alarme estiver desativado
+        alarmeState = false; // Alarme desativado
+    }
 
     // Lida com o botão físico da luz da área
     if (digitalRead(botao_luz_area) == LOW) { // Se botão pressionado
@@ -154,6 +167,22 @@ void loop() {
                 return; // Finaliza a conexão após o redirecionamento
             }  // FIM BOTAO FITA LED
 
+            //BOTAO ALARME
+            if (request.indexOf("/Alarme_Toggle") != -1) {
+                //alarmeState = !alarmeState; // Alterna o estado do LED
+                digitalWrite(alarme, HIGH); // Ativa o alarme
+                delay(500); // Espera 500ms
+                digitalWrite(alarme, LOW); // Desativa o alarme
+                delay(500); // Espera 500ms
+                // Redireciona para a página principal
+                client.println("HTTP/1.1 303 See Other");
+                client.println("Location: /");
+                client.println("Connection: close");
+                client.println("Content-Length: 0");
+                client.println();
+                return; // Finaliza a conexão após o redirecionamento
+            }  // FIM BOTAO ALARME
+
 
             
         // FIM VERIFICACAO DO COMANDO DO CLIENTE
@@ -191,7 +220,8 @@ void loop() {
         client.println("</head>");
         client.println("<body>");
         client.println("<div class=\"container\">");
-        client.println("<h1>Controle do LED</h1>");
+        client.println("<h1 style=\"font-size: 1.5em; margin-bottom: 5px;\">Smart Home - Ver.5</h1>");
+        client.println("<h3 style=\"font-size: 0.8em; margin-top: 0;\">beta 1.0</h3>");
 
         client.println("<br> ");
         
@@ -216,6 +246,14 @@ void loop() {
             ? "<a href=\"/FitaLed_Toggle\" class=\"toggle\" style=\"background:rgb(133, 0, 0); width: 50%; display: inline-block; text-align: center;\">Fita LED</a><p class=\"status\">Fita LED está <strong>LIGADA</strong></p>" 
             : "<a href=\"/FitaLed_Toggle\" class=\"toggle\" style=\"background:rgb(0, 63, 0); width: 50%; display: inline-block; text-align: center;\">Fita LED</a><p class=\"status\">Fita LED está <strong>DESLIGADA</strong></p>");
         // FIM BOTAO FITA LED
+
+        client.println("<br> ");
+
+        // INICIO BOTAO ALARME
+        client.println(alarmeState 
+            ? "<a href=\"/Alarme_Toggle\" class=\"toggle\" style=\"background:rgb(133, 0, 0); width: 50%; display: inline-block; text-align: center;\">Alarme</a><p class=\"status\">Alarme está <strong>LIGADO</strong></p>" 
+            : "<a href=\"/Alarme_Toggle\" class=\"toggle\" style=\"background:rgb(0, 63, 0); width: 50%; display: inline-block; text-align: center;\">Alarme</a><p class=\"status\">Alarme está <strong>DESLIGADO</strong></p>");
+        // FIM BOTAO ALARME
 
 
         client.println("</div>");
