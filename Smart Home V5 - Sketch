@@ -72,8 +72,13 @@ void loop() {
         client.println("<body>");
         client.println("<div class=\"container\">");
         client.println("<h1>Controle do LED</h1>");
-        client.println("<a href=\"/LuzArea_Toggle\" class=\"toggle\">Alternar Luz</a>");
+
+        // INICIO BOTAO LUZ AREA
+        client.println("<a href=\"/LuzArea_Toggle\" class=\"toggle\">Luz Area</a>");
         client.println(luzareaState ? "<p class=\"status\">Luz Área está <strong>LIGADA</strong></p>" : "<p class=\"status\">Luz Área está <strong>DESLIGADA</strong></p>");
+        // FIM BOTAO LUZ AREA
+
+        
         client.println("</div>");
         client.println("</body>");
         client.println("</html>");
