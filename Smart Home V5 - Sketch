@@ -6,12 +6,28 @@ const char* password = "taystrOrbi"; // Substitua pela senha da sua rede Wi-Fi
 
 WiFiServer server(80);
 
+//INICIO VARIAVEIS DO PROJETO
+
 const int luz_area = 0; // LED conectado à porta 0
+const int luz_jardim = 1; // LED conectado à porta 0
+
 bool luzareaState = false; // Estado inicial do LED
+bool luzjardimState = false; // Estado inicial do LED
+
+//FIM VARIAVEIS DO PROJETO
 
 void setup() {
+
+    // INICIALIZACAO DAS VARIAVEIS
+    
     pinMode(luz_area, OUTPUT);
     digitalWrite(luz_area, LOW);
+
+    pinMode(luz_jardim, OUTPUT);
+    digitalWrite(luz_jardim, LOW);
+    
+
+    // FIM INICIALIZACAO DAS VARIAVEIS
 
     Serial.begin(115200);
     WiFi.begin(ssid, password);
@@ -37,19 +53,37 @@ void loop() {
         Serial.println(request);
         client.flush();
 
-        // Verifica se o cliente enviou o comando para alternar o LED
-        if (request.indexOf("/LuzArea_Toggle") != -1) {
-            luzareaState = !luzareaState; // Alterna o estado do LED
-            digitalWrite(luz_area, luzareaState ? HIGH : LOW);
+        // INICIO VERIFICACAO DO COMANDO DO CLIENTE
 
-            // Redireciona para a página principal
-            client.println("HTTP/1.1 303 See Other");
-            client.println("Location: /");
-            client.println("Connection: close");
-            client.println("Content-Length: 0");
-            client.println();
-            return; // Finaliza a conexão após o redirecionamento
-        }
+            //BOTAO LUZ AREA
+            if (request.indexOf("/LuzArea_Toggle") != -1) {
+                luzareaState = !luzareaState; // Alterna o estado do LED
+                digitalWrite(luz_area, luzareaState ? HIGH : LOW);
+                // Redireciona para a página principal
+                client.println("HTTP/1.1 303 See Other");
+                client.println("Location: /");
+                client.println("Connection: close");
+                client.println("Content-Length: 0");
+                client.println();
+                return; // Finaliza a conexão após o redirecionamento
+            }  // FIM BOTAO LUZ AREA
+
+            //BOTAO LUZ JARDIM
+            if (request.indexOf("/LuzJardim_Toggle") != -1) {
+                luzjardimState = !luzjardimState; // Alterna o estado do LED
+                digitalWrite(luz_jardim, luzjardimState ? HIGH : LOW);
+                // Redireciona para a página principal
+                client.println("HTTP/1.1 303 See Other");
+                client.println("Location: /");
+                client.println("Connection: close");
+                client.println("Content-Length: 0");
+                client.println();
+                return; // Finaliza a conexão após o redirecionamento
+            }  // FIM BOTAO LUZ AREA
+
+            
+        // FIM VERIFICACAO DO COMANDO DO CLIENTE
+
 
         // Responde ao cliente
         client.println("HTTP/1.1 200 OK");
@@ -78,7 +112,12 @@ void loop() {
         client.println(luzareaState ? "<p class=\"status\">Luz Área está <strong>LIGADA</strong></p>" : "<p class=\"status\">Luz Área está <strong>DESLIGADA</strong></p>");
         // FIM BOTAO LUZ AREA
 
-        
+        // INICIO BOTAO LUZ JARDIM
+        client.println("<a href=\"/LuzJardim_Toggle\" class=\"toggle\">Luz Jardim</a>");
+        client.println(luzjardimState ? "<p class=\"status\">Luz Jardim está <strong>LIGADA</strong></p>" : "<p class=\"status\">Luz Jardim está <strong>DESLIGADA</strong></p>");
+        // FIM BOTAO LUZ JARDIM
+
+
         client.println("</div>");
         client.println("</body>");
         client.println("</html>");
