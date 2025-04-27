@@ -107,6 +107,7 @@ void loop() {
         client.println("<div class=\"container\">");
         client.println("<h1>Controle do LED</h1>");
 
+        client.println("<br> ");
         
         // INICIO BOTAO LUZ AREA
         client.println(luzareaState 
