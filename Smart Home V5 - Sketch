@@ -1,170 +1,65 @@
 #include <WiFiS3.h>
 #include <WiFiServer.h>
 
-// Credenciais da sua rede
-char ssid[] = "Home_Mesh_06";     
-char pass[] = "taystrOrbi";       
+const char* ssid = "Home_Mesh_06"; // Substitua pelo nome da sua rede Wi-Fi
+const char* password = "taystrOrbi"; // Substitua pela senha da sua rede Wi-Fi
 
 WiFiServer server(80);
 
-// INICIO DECLARAO VARIAVEIS
-  const int luz_area = 0;  // LED na porta 0
-  bool verifica_luz_area = false;  // Estado do LED: false = apagado, true = aceso
-
-// FIM DECLARACAO VARIAVEIS
-
-////////////////////////////////////////////// VOID SETUP ////////////////////////////////////////////////////////
+const int ledPin = 0; // LED conectado à porta 0
+bool ledState = false; // Estado inicial do LED
 
 void setup() {
-  Serial.begin(9600);
+    pinMode(ledPin, OUTPUT);
+    digitalWrite(ledPin, LOW);
 
-  // INICIO DECLARACAO PINS
-    pinMode(luz_area, OUTPUT);
-    digitalWrite(luz_area, LOW);
-  // FIM DECLARACAO PINS
+    Serial.begin(115200);
+    WiFi.begin(ssid, password);
 
-  
+    Serial.print("Conectando ao Wi-Fi");
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(500);
+        Serial.print(".");
+    }
+    Serial.println("\nConectado ao Wi-Fi!");
+    Serial.print("Endereço IP: ");
+    Serial.println(WiFi.localIP());
 
-  // Conecta na rede Wi-Fi
-  while (WiFi.begin(ssid, pass) != WL_CONNECTED) {
-    Serial.println("Tentando conectar...");
-    delay(1000);
-  }
-  
-  Serial.println("WiFi conectado!");
-  Serial.print("IP: ");
-  Serial.println(WiFi.localIP());
-
-  server.begin();
+    server.begin();
 }
 
-
-////////////////////////////////////////////// VOID LOOP ////////////////////////////////////////////////////////
-
 void loop() {
-
-   WiFiClient client = server.available();
-
-
+    // Lida com conexões do cliente
+    WiFiClient client = server.available();
     if (client) {
-    Serial.println("Cliente conectado!");
-    while (client.connected()) {
-      if (client.available()) {
+        Serial.println("Cliente conectado!");
         String request = client.readStringUntil('\r');
         Serial.println(request);
         client.flush();
 
+        // Verifica se o cliente enviou o comando para alternar o LED
+        if (request.indexOf("/TOGGLE") != -1) {
+            ledState = !ledState; // Alterna o estado do LED
+            digitalWrite(ledPin, ledState ? HIGH : LOW);
 
-        ////////////////////////////////////////////
-        // INICIO VERIFICACAO QUAL BOTAO FOI CLICADO
-        
-         if (request.indexOf("/botao") != -1) {
-          verifica_luz_area = !verifica_luz_area;  // Inverte o estado
-          digitalWrite(luz_area, verifica_luz_area ? HIGH : LOW);  // Liga ou desliga o LED
+            // Redireciona para a página principal
+            client.println("HTTP/1.1 303 See Other");
+            client.println("Location: /");
+            client.println();
+            return; // Finaliza a conexão após o redirecionamento
         }
 
-        // Prepara o texto do botão
-        String textoBotao = verifica_luz_area ? "DESLIGAR" : "LIGAR";
-
-        // FIM VERIFICACAO QUAL BOTAO FOI CLICADO
-        ////////////////////////////////////////////
- 
-  
-  
-
-        // INICIO PAGINA HTML
-
-client.println("HTTP/1.1 200 OK");
-client.println("Content-Type: text/html");
-client.println("Connection: close");
-client.println();
-client.println("<!DOCTYPE html>");
-client.println("<html lang=\"en\">");
-client.println("<head>");
-client.println("<meta charset=\"UTF-8\">");
-client.println("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">");
-client.println("<title>Arduino Uno R4 WiFi</title>");
-client.println("<style>");
-client.println("body {");
-client.println("  background: linear-gradient(135deg, #74ebd5, #ACB6E5);");
-client.println("  font-family: 'Poppins', sans-serif;");
-client.println("  margin: 0;");
-client.println("  padding: 0;");
-client.println("  display: flex;");
-client.println("  justify-content: center;");
-client.println("  align-items: center;");
-client.println("  height: 100vh;");
-client.println("  text-align: center;");
-client.println("  overflow: hidden;");
-client.println("}");
-client.println(".container {");
-client.println("  background: #fff;");
-client.println("  width: 90%;");
-client.println("  max-width: 300px;");
-client.println("  padding: 20px;");
-client.println("  border-radius: 10px;");
-client.println("  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);");
-client.println("  animation: fadeIn 0.6s ease;");
-client.println("}");
-client.println("h1 {");
-client.println("  color: #333;");
-client.println("  font-size: 18px;");
-client.println("  margin-bottom: 15px;");
-client.println("}");
-client.println("button {");
-client.println("  background-color: #007BFF;");
-client.println("  color: white;");
-client.println("  border: none;");
-client.println("  padding: 10px 0;");
-client.println("  font-size: 16px;");
-client.println("  border-radius: 8px;");
-client.println("  width: 100%;");
-client.println("  cursor: pointer;");
-client.println("  transition: background-color 0.3s, transform 0.2s;");
-client.println("}");
-client.println("button:hover {");
-client.println("  background-color: #0056b3;");
-client.println("  transform: scale(1.05);");
-client.println("}");
-client.println(".status {");
-client.println("  font-size: 14px;");
-client.println("  color: #555;");
-client.println("  margin-top: 8px;");
-client.println("}");
-client.println("@keyframes fadeIn {");
-client.println("  from { opacity: 0; }");
-client.println("  to { opacity: 1; }");
-client.println("}");
-client.println("</style>");
-client.println("</head>");
-client.println("<body>");
-client.println("<div class='container'>");
-client.println("<h1>Controle da Luz da Área</h1>");
-
-client.print("<button  onclick=\"location.href='/botao'\">");
-        client.print(textoBotao);
-        client.println("</button>");
-
-client.println("<div class='status'>");
-client.print("Estado: ");
-client.print(verifica_luz_area ? "Luz Acesa" : "Luz Apagada");
-client.println("</div>");
-client.println("</div>");
-client.println("</body>");
-client.println("</html>");
-
-
-
-
-
-
-        break;
-
-        // FIM PAGINA HTML
-      }
+        // Responde ao cliente
+        client.println("HTTP/1.1 200 OK");
+        client.println("Content-Type: text/html; charset=UTF-8"); // Adiciona charset UTF-8
+        client.println();
+        client.println("<!DOCTYPE HTML>");
+        client.println("<html>");
+        client.println("<h1>Controle do LED</h1>");
+        client.println(ledState ? "<p>LED está LIGADO</p>" : "<p>LED está DESLIGADO</p>");
+        client.println("<button onclick=\"location.href='/TOGGLE'\">Alternar LED</button>");
+        client.println("</html>");
+        client.stop();
+        Serial.println("Cliente desconectado.");
     }
-    delay(10);
-    client.stop();
-    Serial.println("Cliente desconectado");
-  }
 }
