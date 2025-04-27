@@ -14,7 +14,8 @@ IPAddress gateway(192, 168, 1, 1);        // Gateway NZ
 //IPAddress subnet(255, 255, 255, 0);       // Máscara de sub-rede
 //IPAddress dns(8, 8, 8, 8);                // Servidor DNS (opcional)
 
-WiFiServer server(3001);
+//WiFiServer server(3001);  // PORTA BRASIL
+WiFiServer server(65123);  // PORTA BRASIL
 
 //INICIO VARIAVEIS DO PROJETO
 
