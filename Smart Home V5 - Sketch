@@ -6,12 +6,12 @@ const char* password = "taystrOrbi"; // Substitua pela senha da sua rede Wi-Fi
 
 WiFiServer server(80);
 
-const int ledPin = 0; // LED conectado à porta 0
-bool ledState = false; // Estado inicial do LED
+const int luz_area = 0; // LED conectado à porta 0
+bool luzareaState = false; // Estado inicial do LED
 
 void setup() {
-    pinMode(ledPin, OUTPUT);
-    digitalWrite(ledPin, LOW);
+    pinMode(luz_area, OUTPUT);
+    digitalWrite(luz_area, LOW);
 
     Serial.begin(115200);
     WiFi.begin(ssid, password);
@@ -38,9 +38,9 @@ void loop() {
         client.flush();
 
         // Verifica se o cliente enviou o comando para alternar o LED
-        if (request.indexOf("/TOGGLE") != -1) {
-            ledState = !ledState; // Alterna o estado do LED
-            digitalWrite(ledPin, ledState ? HIGH : LOW);
+        if (request.indexOf("/LuzArea_Toggle") != -1) {
+            luzareaState = !luzareaState; // Alterna o estado do LED
+            digitalWrite(luz_area, luzareaState ? HIGH : LOW);
 
             // Redireciona para a página principal
             client.println("HTTP/1.1 303 See Other");
@@ -56,8 +56,10 @@ void loop() {
         client.println("<!DOCTYPE HTML>");
         client.println("<html>");
         client.println("<h1>Controle do LED</h1>");
-        client.println(ledState ? "<p>LED está LIGADO</p>" : "<p>LED está DESLIGADO</p>");
-        client.println("<button onclick=\"location.href='/TOGGLE'\">Alternar LED</button>");
+        
+        client.println("<button onclick=\"location.href='/LuzArea_Toggle'\">Luz Area</button>");
+        client.println(luzareaState ? "<p>Luz Area está LIGADO</p>" : "<p>Luz Area está DESLIGADO</p>");
+
         client.println("</html>");
         client.stop();
         Serial.println("Cliente desconectado.");
