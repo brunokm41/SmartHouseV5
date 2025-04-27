@@ -9,10 +9,12 @@ WiFiServer server(80);
 //INICIO VARIAVEIS DO PROJETO
 
 const int luz_area = 0; // LED conectado à porta 0
-const int luz_jardim = 1; // LED conectado à porta 0
+const int luz_jardim = 1; // LED conectado à porta 1
+const int fita_led = 2; // LED conectado à porta 2
 
 bool luzareaState = false; // Estado inicial do LED
 bool luzjardimState = false; // Estado inicial do LED
+bool fitaledState = false; // Estado inicial do LED
 
 //FIM VARIAVEIS DO PROJETO
 
@@ -25,6 +27,9 @@ void setup() {
 
     pinMode(luz_jardim, OUTPUT);
     digitalWrite(luz_jardim, LOW);
+
+    pinMode(fita_led, OUTPUT);
+    digitalWrite(fita_led, LOW);
     
 
     // FIM INICIALIZACAO DAS VARIAVEIS
@@ -81,6 +86,20 @@ void loop() {
                 return; // Finaliza a conexão após o redirecionamento
             }  // FIM BOTAO LUZ AREA
 
+            //BOTAO FITA LED
+            if (request.indexOf("/FitaLed_Toggle") != -1) {
+                fitaledState = !fitaledState; // Alterna o estado do LED
+                digitalWrite(fita_led, fitaledState ? HIGH : LOW);
+                // Redireciona para a página principal
+                client.println("HTTP/1.1 303 See Other");
+                client.println("Location: /");
+                client.println("Connection: close");
+                client.println("Content-Length: 0");
+                client.println();
+                return; // Finaliza a conexão após o redirecionamento
+            }  // FIM BOTAO FITA LED
+
+
             
         // FIM VERIFICACAO DO COMANDO DO CLIENTE
 
@@ -96,7 +115,7 @@ void loop() {
         client.println("<style>");
         client.println("body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: linear-gradient(135deg, #f4f4f4, #e0e0e0); color: #333; display: flex; justify-content: center; align-items: center; height: 100vh; }");
         client.println(".container { width: 90%; max-width: 300px; padding: 20px; background: #fff; border-radius: 12px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; top: -10%; }");
-        client.println("body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: linear-gradient(135deg, #add8e6, #ffffff); color: #333; display: flex; justify-content: center; align-items: center; height: 100vh; }");
+        client.println("body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: linear-gradient(135deg,rgb(2, 192, 255), #ffffff); color: #333; display: flex; justify-content: center; align-items: center; height: 100vh; }");
         client.println("h1 { font-size: 1.2em; margin-bottom: 15px; }");
         client.println(".toggle { display: inline-block; padding: 8px 16px; background: #007BFF; color: #fff; text-decoration: none; border-radius: 5px; font-size: 0.9em; margin-bottom: 5px; }");
         client.println(".toggle:hover { background: #0056b3; }");
@@ -122,6 +141,14 @@ void loop() {
             ? "<a href=\"/LuzJardim_Toggle\" class=\"toggle\" style=\"background:rgb(133, 0, 0); width: 50%; display: inline-block; text-align: center;\">Luz Jardim</a><p class=\"status\">Luz Jardim está <strong>LIGADA</strong></p>" 
             : "<a href=\"/LuzJardim_Toggle\" class=\"toggle\" style=\"background:rgb(0, 63, 0); width: 50%; display: inline-block; text-align: center;\">Luz Jardim</a><p class=\"status\">Luz Jardim está <strong>DESLIGADA</strong></p>");
         // FIM BOTAO LUZ JARDIM
+
+        client.println("<br> ");
+
+        // INICIO BOTAO FITA LED
+        client.println(fitaledState 
+            ? "<a href=\"/FitaLed_Toggle\" class=\"toggle\" style=\"background:rgb(133, 0, 0); width: 50%; display: inline-block; text-align: center;\">Fita LED</a><p class=\"status\">Fita LED está <strong>LIGADA</strong></p>" 
+            : "<a href=\"/FitaLed_Toggle\" class=\"toggle\" style=\"background:rgb(0, 63, 0); width: 50%; display: inline-block; text-align: center;\">Fita LED</a><p class=\"status\">Fita LED está <strong>DESLIGADA</strong></p>");
+        // FIM BOTAO FITA LED
 
 
         client.println("</div>");
