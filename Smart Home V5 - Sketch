@@ -166,5 +166,5 @@ client.println("</html>");
     Serial.println("Cliente desconectado");
   }
 }
-
-//bruno
+// FIM VOID LOOP
+// FIM DO CÓDIGO
