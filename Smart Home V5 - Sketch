@@ -58,7 +58,7 @@ void loop() {
         ////////////////////////////////////////////
         // INICIO VERIFICACAO QUAL BOTAO FOI CLICADO
         
-        if (request.indexOf("/botao") != -1) {
+         if (request.indexOf("/botao") != -1) {
           verifica_luz_area = !verifica_luz_area;  // Inverte o estado
           digitalWrite(luz_area, verifica_luz_area ? HIGH : LOW);  // Liga ou desliga o LED
         }
@@ -140,9 +140,11 @@ client.println("</head>");
 client.println("<body>");
 client.println("<div class='container'>");
 client.println("<h1>Controle da Luz da Área</h1>");
-client.print("<button onclick=\"location.href='/botao'\">");
-client.print(textoBotao);
-client.println("</button>");
+
+client.print("<button  onclick=\"location.href='/botao'\">");
+        client.print(textoBotao);
+        client.println("</button>");
+
 client.println("<div class='status'>");
 client.print("Estado: ");
 client.print(verifica_luz_area ? "Luz Acesa" : "Luz Apagada");
@@ -166,5 +168,3 @@ client.println("</html>");
     Serial.println("Cliente desconectado");
   }
 }
-// FIM VOID LOOP
-// FIM DO CÓDIGO
