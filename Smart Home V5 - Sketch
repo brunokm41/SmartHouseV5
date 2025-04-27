@@ -127,6 +127,20 @@ void loop() {
         client.println("<html>");
         client.println("<head>");
         client.println("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">");
+
+        // Meta tag para auto-refresh a cada 3 segundos (3000 ms)
+        // client.println("<meta http-equiv=\"refresh\" content=\"3\">");
+
+        // JAVASCRIPT PARA RECARREGAR A PAGINA AO RESTAURAR A ABA
+        client.println("<script>");
+        client.println("document.addEventListener('visibilitychange', function() {");
+        client.println("    if (document.visibilityState === 'visible') {");
+        client.println("        location.reload();");  // Recarrega a página quando a aba for restaurada
+        client.println("    }");
+        client.println("});");
+        client.println("</script>");
+        // FIM JAVASCRIPT 
+
         client.println("<style>");
         client.println("body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: linear-gradient(135deg, #f4f4f4, #e0e0e0); color: #333; display: flex; justify-content: center; align-items: center; height: 100vh; }");
         client.println(".container { width: 90%; max-width: 300px; padding: 20px; background: #fff; border-radius: 12px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; top: -10%; }");
