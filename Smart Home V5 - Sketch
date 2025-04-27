@@ -9,6 +9,7 @@ WiFiServer server(80);
 //INICIO VARIAVEIS DO PROJETO
 
 const int luz_area = 0; // LED conectado à porta 0
+const int botao_luz_area = 13; //botao fisico luz area
 const int luz_jardim = 1; // LED conectado à porta 1
 const int fita_led = 2; // LED conectado à porta 2
 
@@ -24,6 +25,9 @@ void setup() {
     
     pinMode(luz_area, OUTPUT);
     digitalWrite(luz_area, LOW);
+    
+    //botao fisico
+    pinMode(botao_luz_area, INPUT_PULLUP); // Configura o botão com pull-up interno
 
     pinMode(luz_jardim, OUTPUT);
     digitalWrite(luz_jardim, LOW);
@@ -50,6 +54,17 @@ void setup() {
 }
 
 void loop() {
+
+
+    if (digitalRead(botao_luz_area) == LOW) { // Se botão pressionado
+        delay(50); // Debounce simples
+        if (digitalRead(botao_luz_area) == LOW) { // Confirma pressionado
+            luzareaState = !luzareaState; // Alterna o estado
+            digitalWrite(luz_area, luzareaState ? HIGH : LOW);
+            delay(300); // Evita múltiplos toggles muito rápidos
+        }
+    }
+
     // Lida com conexões do cliente
     WiFiClient client = server.available();
     if (client) {
