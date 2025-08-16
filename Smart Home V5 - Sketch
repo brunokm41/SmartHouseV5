@@ -1,15 +1,15 @@
 #include <WiFiS3.h>
 #include <WiFiServer.h>
 
-const char* ssid = "Home_Mesh_06"; // Substitua pelo nome da sua rede Wi-Fi
-const char* password = "taystrOrbi"; // Substitua pela senha da sua rede Wi-Fi
+const char* ssid = "Smart Home"; // Substitua pelo nome da sua rede Wi-Fi
+const char* password = "miranda642"; // Substitua pela senha da sua rede Wi-Fi
 
 // Configurações de IP fixo
-IPAddress local_ip(192, 168, 1, 45);     // IP NZ
-//IPAddress local_ip(192, 168, 0, 199);     // IP Brasil
+//IPAddress local_ip(192, 168, 1, 45);     // IP NZ
+IPAddress local_ip(192, 168, 68, 114);     // IP Brasil
 
-IPAddress gateway(192, 168, 1, 1);        // Gateway NZ
-//IPAddress gateway(192, 168, 0, 1);        // Gateway Brasil
+//IPAddress gateway(192, 168, 1, 1);        // Gateway NZ
+IPAddress gateway(192, 168, 68, 1);        // Gateway Brasil
 
 //IPAddress subnet(255, 255, 255, 0);       // Máscara de sub-rede
 //IPAddress dns(8, 8, 8, 8);                // Servidor DNS (opcional)
@@ -22,8 +22,15 @@ WiFiServer server(65123);  // PORTA BRASIL
 const int luz_area = 0; // LED conectado à porta 0
 const int botao_luz_area = 13; //botao fisico luz area
 
-const int luz_jardim = 1; // LED conectado à porta 1
-const int botao_luz_jardim = 12; //botao fisico luz jardim
+const int portao_social = 4; // RELE conectado à porta 4
+const int botao_portao_social = 14; //botao fisico portao social
+
+const int portao = 1; // LED conectado à porta 1
+const int botao_portao = 12; //botao fisico luz jardim
+int verifica_portao_aberto = 9; // verifica alarme ativo ou nao
+int verifica_portao_fechado = 8; // verifica alarme ativo ou nao
+
+
 
 const int fita_led = 2; // LED conectado à porta 2
 const int botao_fita_led = 11; //botao fisico fita led
@@ -32,9 +39,10 @@ const int alarme = 3; // LED conectado à porta 3
 int verifica_alarme = 10; // verifica alarme ativo ou nao
 
 bool luzareaState = false; // Estado inicial do LED
-bool luzjardimState = false; // Estado inicial do LED
+bool portaoState = false; // Estado inicial do LED
 bool fitaledState = false; // Estado inicial do LED
 bool alarmeState = false; // Estado inicial do LED
+bool portaosocialState = false; 
 //int alarmeState = digitalRead(verifica_alarme); // Estado inicial do LED
 //FIM VARIAVEIS DO PROJETO
 
@@ -44,9 +52,14 @@ void setup() {
     
     pinMode(luz_area, OUTPUT);
     digitalWrite(luz_area, LOW);
+
+    pinMode(portao_social, OUTPUT);
+    digitalWrite(portao_social, LOW);
     
-    pinMode(luz_jardim, OUTPUT);
-    digitalWrite(luz_jardim, LOW);
+    pinMode(portao, OUTPUT);
+    digitalWrite(portao, LOW);
+    pinMode(verifica_portao_aberto, OUTPUT);
+    pinMode(verifica_portao_fechado, OUTPUT);
 
     pinMode(fita_led, OUTPUT);
     digitalWrite(fita_led, LOW);
@@ -58,8 +71,9 @@ void setup() {
     //INICIALIZACAO BOTOES FISICOS
     //botao fisico luz area
     pinMode(botao_luz_area, INPUT_PULLUP); // Configura o botão com pull-up interno
-    pinMode(botao_luz_jardim, INPUT_PULLUP); // Configura o botão com pull-up interno
+    pinMode(botao_portao, INPUT_PULLUP); // Configura o botão com pull-up interno
     pinMode(botao_fita_led, INPUT_PULLUP); // Configura o botão com pull-up interno
+    pinMode(botao_portao_social, INPUT_PULLUP);
 
     // FIM INICIALIZACAO DAS VARIAVEIS
 
@@ -82,11 +96,19 @@ void loop() {
 
 
     // Verifica se o alarme esta ativado
-    if (digitalRead(verifica_alarme) == 0) { // Se o alarme estiver ativado
+    if (digitalRead(verifica_alarme) == 1) { // Se o alarme estiver ativado
         alarmeState = true; // Alarme ativado
-    } else if (digitalRead(verifica_alarme) == 1) { // Se o alarme estiver desativado
+    } else if (digitalRead(verifica_alarme) == 0) { // Se o alarme estiver desativado
         alarmeState = false; // Alarme desativado
     }
+
+    // Verifica se o portao esta aberto ou fechado
+    if (digitalRead(verifica_portao_aberto) == 1 && digitalRead(verifica_portao_fechado) == 0) { 
+    portaoState = true; 
+} else if (digitalRead(verifica_portao_aberto) == 0 && digitalRead(verifica_portao_fechado) == 1) { 
+    portaoState = false; 
+}
+
 
     // Lida com o botão físico da luz da área
     if (digitalRead(botao_luz_area) == LOW) { // Se botão pressionado
@@ -98,15 +120,43 @@ void loop() {
         }
     }
 
-    // Lida com o botão físico da luz do jardim
-    if (digitalRead(botao_luz_jardim) == LOW) { // Se botão pressionado
+    // Lida com o botão físico do portao social
+    if (digitalRead(botao_portao_social) == LOW) { // Se botão pressionado
+        delay(50);
+        digitalWrite(portao_social, HIGH);  // Fecha o relé
+        delay(500);                  // Aguarda 300ms
+        digitalWrite(portao_social, LOW);   // Abre o relé
+        delay(500);
+    }
+    /*
+    if (digitalRead(botao_portao_social) == LOW) { // Se botão pressionado
         delay(50); // Debounce simples
-        if (digitalRead(botao_luz_jardim) == LOW) { // Confirma pressionado
-            luzjardimState = !luzjardimState; // Alterna o estado
-            digitalWrite(luz_jardim, luzjardimState ? HIGH : LOW);
+        if (digitalRead(botao_portao_social) == LOW) { // Confirma pressionado
+            portaosocialState = !portaosocialState; // Alterna o estado
+            digitalWrite(portao_social, portaosocialState ? HIGH : LOW);
             delay(300); // Evita múltiplos toggles muito rápidos
         }
     }
+    */
+
+    // Lida com o botão físico do portao
+    if (digitalRead(botao_portao) == LOW) { // Se botão pressionado
+        delay(50);
+        digitalWrite(portao, HIGH);  // Fecha o relé
+        delay(500);                  // Aguarda 300ms
+        digitalWrite(portao, LOW);   // Abre o relé
+        delay(500);
+    }
+    /*
+    if (digitalRead(botao_portao) == LOW) { // Se botão pressionado
+        delay(50); // Debounce simples
+        if (digitalRead(botao_portao) == LOW) { // Confirma pressionado
+            portaoState = !portaoState; // Alterna o estado
+            digitalWrite(portao, portaoState ? HIGH : LOW);
+            delay(300); // Evita múltiplos toggles muito rápidos
+        }
+    }
+    */
 
     // Lida com o botão físico da fita LED
     if (digitalRead(botao_fita_led) == LOW) { // Se botão pressionado
@@ -141,10 +191,28 @@ void loop() {
                 return; // Finaliza a conexão após o redirecionamento
             }  // FIM BOTAO LUZ AREA
 
-            //BOTAO LUZ JARDIM
-            if (request.indexOf("/LuzJardim_Toggle") != -1) {
-                luzjardimState = !luzjardimState; // Alterna o estado do LED
-                digitalWrite(luz_jardim, luzjardimState ? HIGH : LOW);
+            //BOTAO PORTAO SOCIAL
+            if (request.indexOf("/PortaoSocial_Toggle") != -1) {
+                portaosocialState = !portaosocialState; // Alterna o estado do LED
+                digitalWrite(portao_social, portaosocialState ? HIGH : LOW);
+                // Redireciona para a página principal
+                client.println("HTTP/1.1 303 See Other");
+                client.println("Location: /");
+                client.println("Connection: close");
+                client.println("Content-Length: 0");
+                client.println();
+                return; // Finaliza a conexão após o redirecionamento
+            }  // FIM BOTAO PORTAO SOCIAL
+
+            //BOTAO ABERTURA/FECHAMENTO PORTAO BASCULANTE
+            //if (request.indexOf("/Portao_Toggle") != -1) {
+            //    portaoState = !portaoState; // Alterna o estado do LED
+            //    digitalWrite(portao, portaoState ? HIGH : LOW);
+            if (request.indexOf("/Portao_Toggle") != -1) {
+                digitalWrite(portao, HIGH);  // Fecha o relé
+                delay(500);                  // Aguarda 300ms
+                digitalWrite(portao, LOW);   // Abre o relé
+                delay(500);                  // Aguarda 300ms
                 // Redireciona para a página principal
                 client.println("HTTP/1.1 303 See Other");
                 client.println("Location: /");
@@ -230,13 +298,21 @@ void loop() {
             ? "<a href=\"/LuzArea_Toggle\" class=\"toggle\" style=\"background:rgb(133, 0, 0); width: 50%; display: inline-block; text-align: center;\">Luz Area</a><p class=\"status\">Luz Area está <strong>LIGADA</strong></p>" 
             : "<a href=\"/LuzArea_Toggle\" class=\"toggle\" style=\"background:rgb(0, 63, 0); width: 50%; display: inline-block; text-align: center;\">Luz Area</a><p class=\"status\">Luz Area está <strong>DESLIGADA</strong></p>");
         // FIM BOTAO LUZ AREA
+
+        client.println("<br> ");
+
+        // INICIO BOTAO PORTAO SOCIAL
+        client.println(portaosocialState 
+            ? "<a href=\"/PortaoSocial_Toggle\" class=\"toggle\" style=\"background:rgb(133, 0, 0); width: 50%; display: inline-block; text-align: center;\">Portao Social</a><p class=\"status\">Portao Social está <strong>LIGADA</strong></p>" 
+            : "<a href=\"/PortaoSocial_Toggle\" class=\"toggle\" style=\"background:rgb(0, 63, 0); width: 50%; display: inline-block; text-align: center;\">Portao Social</a><p class=\"status\">Portao Social está <strong>DESLIGADA</strong></p>");
+        // FIM BOTAO PORTAO SOCIAL
         
         client.println("<br> ");
         
         // INICIO BOTAO LUZ JARDIM
-        client.println(luzjardimState 
-            ? "<a href=\"/LuzJardim_Toggle\" class=\"toggle\" style=\"background:rgb(133, 0, 0); width: 50%; display: inline-block; text-align: center;\">Luz Jardim</a><p class=\"status\">Luz Jardim está <strong>LIGADA</strong></p>" 
-            : "<a href=\"/LuzJardim_Toggle\" class=\"toggle\" style=\"background:rgb(0, 63, 0); width: 50%; display: inline-block; text-align: center;\">Luz Jardim</a><p class=\"status\">Luz Jardim está <strong>DESLIGADA</strong></p>");
+        client.println(portaoState 
+            ? "<a href=\"/Portao_Toggle\" class=\"toggle\" style=\"background:rgb(133, 0, 0); width: 50%; display: inline-block; text-align: center;\">Portao</a><p class=\"status\">O portao está <strong>ABERTO</strong></p>" 
+            : "<a href=\"/Portao_Toggle\" class=\"toggle\" style=\"background:rgb(0, 63, 0); width: 50%; display: inline-block; text-align: center;\">Portao</a><p class=\"status\">O portao está <strong>FECHADO</strong></p>");
         // FIM BOTAO LUZ JARDIM
 
         client.println("<br> ");
