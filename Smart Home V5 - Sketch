@@ -296,17 +296,17 @@ void loop() {
 
         // INICIO BOTAO PORTAO SOCIAL
         client.println(portaosocialState 
-            ? "<a href=\"/PortaoSocial_Toggle\" class=\"toggle\" style=\"background:rgb(133, 0, 0); width: 50%; display: inline-block; text-align: center;\">Portao Social</a><p class=\"status\">Portao Social está <strong>LIGADA</strong></p>" 
-            : "<a href=\"/PortaoSocial_Toggle\" class=\"toggle\" style=\"background:rgb(0, 63, 0); width: 50%; display: inline-block; text-align: center;\">Portao Social</a><p class=\"status\">Portao Social está <strong>DESLIGADA</strong></p>");
+            ? "<a href=\"/PortaoSocial_Toggle\" class=\"toggle\" style=\"background:rgb(133, 0, 0); width: 50%; display: inline-block; text-align: center;\">Portao Social</a><p class=\"status\">Portao Social está <strong>ABERTO</strong></p>" 
+            : "<a href=\"/PortaoSocial_Toggle\" class=\"toggle\" style=\"background:rgb(0, 63, 0); width: 50%; display: inline-block; text-align: center;\">Portao Social</a><p class=\"status\">Portao Social está <strong>FECHADO</strong></p>");
         // FIM BOTAO PORTAO SOCIAL
         
         client.println("<br> ");
         
-        // INICIO BOTAO LUZ JARDIM
+        // INICIO BOTAO PORTAO BASCULANTE
         client.println(portaoState 
             ? "<a href=\"/Portao_Toggle\" class=\"toggle\" style=\"background:rgb(133, 0, 0); width: 50%; display: inline-block; text-align: center;\">Portao</a><p class=\"status\">O portao está <strong>ABERTO</strong></p>" 
             : "<a href=\"/Portao_Toggle\" class=\"toggle\" style=\"background:rgb(0, 63, 0); width: 50%; display: inline-block; text-align: center;\">Portao</a><p class=\"status\">O portao está <strong>FECHADO</strong></p>");
-        // FIM BOTAO LUZ JARDIM
+        // FIM BOTAO PORTAO BASCULANTE
 
         client.println("<br> ");
 
