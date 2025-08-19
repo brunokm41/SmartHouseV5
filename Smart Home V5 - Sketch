@@ -24,7 +24,7 @@ const int botao_luz_area = 13; //botao fisico luz area
 
 const int portao_social = 4; // RELE conectado à porta 4
 const int botao_portao_social = 14; //botao fisico portao social
-int verifica_portaosocial = 15; // verifica alarme ativo ou nao
+int verifica_portaosocial = 5; // verifica alarme ativo ou nao
 
 
 const int portao = 1; // LED conectado à porta 1
@@ -57,17 +57,18 @@ void setup() {
 
     pinMode(portao_social, OUTPUT);
     digitalWrite(portao_social, HIGH);
+    pinMode(verifica_portaosocial, OUTPUT);
     
     pinMode(portao, OUTPUT);
     digitalWrite(portao, LOW);
-    pinMode(verifica_portao_aberto, OUTPUT);
-    pinMode(verifica_portao_fechado, OUTPUT);
+    pinMode(verifica_portao_aberto, INPUT);
+    pinMode(verifica_portao_fechado, INPUT);
 
     pinMode(fita_led, OUTPUT);
     digitalWrite(fita_led, LOW);
 
     pinMode(alarme, OUTPUT);
-    pinMode(verifica_alarme, OUTPUT);
+    pinMode(verifica_alarme, INPUT);
     //digitalWrite(alarme, LOW);
     
     //INICIALIZACAO BOTOES FISICOS
@@ -112,9 +113,9 @@ void loop() {
     }
 
 // Verifica se o portao social esta aberto ou fechado
-    if (digitalRead(verifica_portaosocial) == 1 ) { 
+    if (digitalRead(verifica_portaosocial) == 0 ) { 
     portaosocialState = true; 
-    } else if (digitalRead(verifica_portaosocial) == 0) { 
+    } else if (digitalRead(verifica_portaosocial) == 1) { 
     portaosocialState = false; 
     }
 
