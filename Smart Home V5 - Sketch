@@ -1,8 +1,8 @@
 #include <WiFiS3.h>
 #include <WiFiServer.h>
 
-const char* ssid = "Smart Home"; //rede Wi-Fi
-const char* password = "miranda642"; //senha Wi-Fi
+const char* ssid = "Smart Home"; // Substitua pelo nome da sua rede Wi-Fi
+const char* password = "miranda642"; // Substitua pela senha da sua rede Wi-Fi
 
 // Configurações de IP fixo
 //IPAddress local_ip(192, 168, 1, 45);     // IP NZ
@@ -18,28 +18,33 @@ IPAddress gateway(192, 168, 68, 1);        // Gateway Brasil
 WiFiServer server(65123);  // PORTA BRASIL
 
 //INICIO VARIAVEIS DO PROJETO
-const int luz_area = 0; //Rele Luz Garagem Conectado a porta 0
-const int botao_luz_area = 13; //botao fisico luz Garagem (pulsador)
 
-const int portao_social = 4; //Rele conectado à porta 4
-const int botao_portao_social = 14; //botao fisico portao social (pulsador)
+const int luz_area = 0; // LED conectado à porta 0
+const int botao_luz_area = 13; //botao fisico luz area
 
-const int portao = 1; //Rele conectado à porta 1
-const int botao_portao = 12; //botao fisico luz jardim (pulsador)
-int verifica_portao_aberto = 9; //verifica se portao esta aberto
-int verifica_portao_fechado = 8; //verifica se portao esta fechado
+const int portao_social = 4; // RELE conectado à porta 4
+const int botao_portao_social = 14; //botao fisico portao social
+int verifica_portaosocial = 15; // verifica alarme ativo ou nao
 
-const int fita_led = 2; //Rele Fita Led conectado à porta 2
-const int botao_fita_led = 11; //botao fisico fita led (pulsador)
 
-const int alarme = 3; //Rele com controle para acionamento do alarme conectado à porta 3
-int verifica_alarme = 10; //verifica se alarme esta ativo ou nao, usa o led da central
+const int portao = 1; // LED conectado à porta 1
+const int botao_portao = 12; //botao fisico luz jardim
+int verifica_portao_aberto = 9; // verifica alarme ativo ou nao
+int verifica_portao_fechado = 8; // verifica alarme ativo ou nao
 
-bool luzareaState = false;      //Estado inicial do Rele
-bool portaoState = false;       //Estado inicial do Rele
-bool fitaledState = false;      //Estado inicial do Rele
-bool alarmeState = false;       //Estado inicial do Rele
-bool portaosocialState = false; //Estado inicial do Rele
+
+
+const int fita_led = 2; // LED conectado à porta 2
+const int botao_fita_led = 11; //botao fisico fita led
+
+const int alarme = 3; // LED conectado à porta 3
+int verifica_alarme = 10; // verifica alarme ativo ou nao
+
+bool luzareaState = false; // Estado inicial do LED
+bool portaoState = false; // Estado inicial do LED
+bool fitaledState = false; // Estado inicial do LED
+bool alarmeState = false; // Estado inicial do LED
+bool portaosocialState = false; 
 //int alarmeState = digitalRead(verifica_alarme); // Estado inicial do LED
 //FIM VARIAVEIS DO PROJETO
 
@@ -51,7 +56,7 @@ void setup() {
     digitalWrite(luz_area, LOW);
 
     pinMode(portao_social, OUTPUT);
-    digitalWrite(portao_social, LOW);
+    digitalWrite(portao_social, HIGH);
     
     pinMode(portao, OUTPUT);
     digitalWrite(portao, LOW);
@@ -67,10 +72,10 @@ void setup() {
     
     //INICIALIZACAO BOTOES FISICOS
     //botao fisico luz area
-    pinMode(botao_luz_area, INPUT_PULLUP);      //Configura o botão com pull-up interno
-    pinMode(botao_portao, INPUT_PULLUP);        //Configura o botão com pull-up interno
-    pinMode(botao_fita_led, INPUT_PULLUP);      //Configura o botão com pull-up interno
-    pinMode(botao_portao_social, INPUT_PULLUP); //Configura o botão com pull-up interno
+    pinMode(botao_luz_area, INPUT_PULLUP); // Configura o botão com pull-up interno
+    pinMode(botao_portao, INPUT_PULLUP); // Configura o botão com pull-up interno
+    pinMode(botao_fita_led, INPUT_PULLUP); // Configura o botão com pull-up interno
+    pinMode(botao_portao_social, INPUT_PULLUP);
 
     // FIM INICIALIZACAO DAS VARIAVEIS
 
@@ -91,75 +96,65 @@ void setup() {
 
 void loop() {
 
+
     // Verifica se o alarme esta ativado
-    if (digitalRead(verifica_alarme) == 1) { //Se o alarme estiver ativado
-        alarmeState = true; //Alarme ativado
-    } else if (digitalRead(verifica_alarme) == 0) { //Se o alarme estiver desativado
-        alarmeState = false; //Alarme desativado
+    if (digitalRead(verifica_alarme) == 1) { // Se o alarme estiver ativado
+        alarmeState = true; // Alarme ativado
+    } else if (digitalRead(verifica_alarme) == 0) { // Se o alarme estiver desativado
+        alarmeState = false; // Alarme desativado
     }
 
-    //Verifica se o portao esta aberto ou fechado
+    // Verifica se o portao esta aberto ou fechado
     if (digitalRead(verifica_portao_aberto) == 1 && digitalRead(verifica_portao_fechado) == 0) { 
     portaoState = true; 
-} else if (digitalRead(verifica_portao_aberto) == 0 && digitalRead(verifica_portao_fechado) == 1) { 
+    } else if (digitalRead(verifica_portao_aberto) == 0 && digitalRead(verifica_portao_fechado) == 1) { 
     portaoState = false; 
-}
+    }
+
+// Verifica se o portao social esta aberto ou fechado
+    if (digitalRead(verifica_portaosocial) == 1 ) { 
+    portaosocialState = true; 
+    } else if (digitalRead(verifica_portaosocial) == 0) { 
+    portaosocialState = false; 
+    }
 
     // Lida com o botão físico da luz da área
-    if (digitalRead(botao_luz_area) == LOW) { //Se botão pressionado
-        delay(50); //Debounce simples
-        if (digitalRead(botao_luz_area) == LOW) { //Confirma pressionado
-            luzareaState = !luzareaState; //Alterna o estado
+    if (digitalRead(botao_luz_area) == LOW) { // Se botão pressionado
+        delay(50); // Debounce simples
+        if (digitalRead(botao_luz_area) == LOW) { // Confirma pressionado
+            luzareaState = !luzareaState; // Alterna o estado
             digitalWrite(luz_area, luzareaState ? HIGH : LOW);
-            delay(300); //Evita múltiplos toggles muito rápidos
+            delay(300); // Evita múltiplos toggles muito rápidos
         }
     }
 
     // Lida com o botão físico do portao social
-    if (digitalRead(botao_portao_social) == LOW) { //Se botão pressionado
+    if (digitalRead(botao_portao_social) == LOW) { // Se botão pressionado
         delay(50);
-        digitalWrite(portao_social, HIGH);  //Fecha o relé
-        delay(500);                  //Aguarda 300ms
-        digitalWrite(portao_social, LOW);   //Abre o relé
+        digitalWrite(portao_social, LOW);  // Fecha o relé
+        delay(500);                  // Aguarda 300ms
+        digitalWrite(portao_social, HIGH);   // Abre o relé
         delay(500);
     }
-    /*
-    if (digitalRead(botao_portao_social) == LOW) { // Se botão pressionado
-        delay(50); // Debounce simples
-        if (digitalRead(botao_portao_social) == LOW) { // Confirma pressionado
-            portaosocialState = !portaosocialState; // Alterna o estado
-            digitalWrite(portao_social, portaosocialState ? HIGH : LOW);
-            delay(300); // Evita múltiplos toggles muito rápidos
-        }
-    }
-    */
+    
 
     // Lida com o botão físico do portao
-    if (digitalRead(botao_portao) == LOW) { //Se botão pressionado
+    if (digitalRead(botao_portao) == LOW) { // Se botão pressionado
         delay(50);
-        digitalWrite(portao, HIGH);  //Fecha o relé
-        delay(500);                  //Aguarda 300ms
-        digitalWrite(portao, LOW);   //Abre o relé
+        digitalWrite(portao, HIGH);  // Fecha o relé
+        delay(500);                  // Aguarda 300ms
+        digitalWrite(portao, LOW);   // Abre o relé
         delay(500);
     }
-    /*
-    if (digitalRead(botao_portao) == LOW) { // Se botão pressionado
-        delay(50); // Debounce simples
-        if (digitalRead(botao_portao) == LOW) { // Confirma pressionado
-            portaoState = !portaoState; // Alterna o estado
-            digitalWrite(portao, portaoState ? HIGH : LOW);
-            delay(300); // Evita múltiplos toggles muito rápidos
-        }
-    }
-    */
+   
 
-    //Lida com o botão físico da fita LED
-    if (digitalRead(botao_fita_led) == LOW) { //Se botão pressionado
-        delay(50); //Debounce simples
-        if (digitalRead(botao_fita_led) == LOW) { //Confirma pressionado
-            fitaledState = !fitaledState; //Alterna o estado
+    // Lida com o botão físico da fita LED
+    if (digitalRead(botao_fita_led) == LOW) { // Se botão pressionado
+        delay(50); // Debounce simples
+        if (digitalRead(botao_fita_led) == LOW) { // Confirma pressionado
+            fitaledState = !fitaledState; // Alterna o estado
             digitalWrite(fita_led, fitaledState ? HIGH : LOW);
-            delay(300); //Evita múltiplos toggles muito rápidos
+            delay(300); // Evita múltiplos toggles muito rápidos
         }
     }
 
@@ -189,7 +184,10 @@ void loop() {
             //BOTAO PORTAO SOCIAL
             if (request.indexOf("/PortaoSocial_Toggle") != -1) {
                 portaosocialState = !portaosocialState; // Alterna o estado do LED
-                digitalWrite(portao_social, portaosocialState ? HIGH : LOW);
+                digitalWrite(portao_social, LOW);  // Fecha o relé
+                delay(500);                  // Aguarda 300ms
+                digitalWrite(portao_social, HIGH);   // Abre o relé
+                delay(500);  
                 // Redireciona para a página principal
                 client.println("HTTP/1.1 303 See Other");
                 client.println("Location: /");
