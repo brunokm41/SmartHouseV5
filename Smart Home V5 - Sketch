@@ -297,8 +297,8 @@ void loop() {
 
         // INICIO BOTAO PORTAO SOCIAL
         client.println(portaosocialState 
-            ? "<a href=\"/PortaoSocial_Toggle\" class=\"toggle\" style=\"background:rgb(133, 0, 0); width: 50%; display: inline-block; text-align: center;\">Portao Social</a><p class=\"status\">Portao Social está <strong>ABERTO</strong></p>" 
-            : "<a href=\"/PortaoSocial_Toggle\" class=\"toggle\" style=\"background:rgb(0, 63, 0); width: 50%; display: inline-block; text-align: center;\">Portao Social</a><p class=\"status\">Portao Social está <strong>FECHADO</strong></p>");
+            ? "<a href=\"/PortaoSocial_Toggle\" class=\"toggle\" onclick=\"return confirm('Deseja mesmo acionar o Portão Social?')\" style=\"background:rgb(133, 0, 0); width: 50%; display: inline-block; text-align: center;\">Portao Social</a><p class=\"status\">Portao Social está <strong>ABERTO</strong></p>" 
+            : "<a href=\"/PortaoSocial_Toggle\" class=\"toggle\" onclick=\"return confirm('Deseja mesmo acionar o Portão Social?')\" style=\"background:rgb(0, 63, 0); width: 50%; display: inline-block; text-align: center;\">Portao Social</a><p class=\"status\">Portao Social está <strong>FECHADO</strong></p>");
         // FIM BOTAO PORTAO SOCIAL
         
         client.println("<br> ");
